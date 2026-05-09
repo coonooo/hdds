@@ -264,7 +264,7 @@ fn set_unicast_ttl_fd(fd: i32, ttl: u8) -> io::Result<()> {
             fd,
             err
         );
-        Err(err)
+        Ok(())
     }
 }
 
