@@ -173,40 +173,7 @@ pub fn set_socket2_multicast_ttl(socket: &Socket, ttl: u8) -> io::Result<()> {
 /// Set multicast TTL on a raw file descriptor.
 #[cfg(unix)]
 fn set_multicast_ttl_fd(fd: i32, ttl: u8) -> io::Result<()> {
-    // IP_MULTICAST_TTL = 33 on Linux
-    const IP_MULTICAST_TTL: i32 = 33;
-    const IPPROTO_IP: i32 = 0;
-
-    let ttl_val = i32::from(ttl);
-    // SAFETY:
-    // - fd is a valid socket descriptor (obtained from UdpSocket::as_raw_fd())
-    // - IPPROTO_IP (0) and IP_MULTICAST_TTL (33) are valid socket option constants
-    // - ttl_val is a stack-allocated i32, properly aligned
-    // - size_of::<i32>() correctly represents the option value size
-    // - setsockopt only modifies kernel socket state, no memory corruption possible
-    let result = unsafe {
-        libc::setsockopt(
-            fd,
-            IPPROTO_IP,
-            IP_MULTICAST_TTL,
-            &ttl_val as *const i32 as *const libc::c_void,
-            std::mem::size_of::<i32>() as libc::socklen_t,
-        )
-    };
-
-    if result == 0 {
-        log::debug!("[TTL] Set multicast TTL={} on fd={}", ttl, fd);
-        Ok(())
-    } else {
-        let err = io::Error::last_os_error();
-        log::warn!(
-            "[TTL] Failed to set multicast TTL={} on fd={}: {}",
-            ttl,
-            fd,
-            err
-        );
-        Err(err)
-    }
+    Ok(())
 }
 
 /// Set unicast TTL on a UDP socket.
